@@ -7,7 +7,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const faqTabs = document.querySelectorAll('.faq-tab-btn');
   const faqPanels = document.querySelectorAll('.faq-content-panel');
 
-/* FAQ */
+// Reviews Component Horizontal Slide Track Engine
+const track = document.getElementById('reviewsTrack');
+const indicatorBars = document.querySelectorAll('.indicator-bar');
+
+if (track && indicatorBars.length > 0) {
+  indicatorBars.forEach(bar => {
+    bar.addEventListener('click', () => {
+      indicatorBars.forEach(b => b.classList.remove('active'));
+      bar.classList.add('active');
+      const slideIndex = parseInt(bar.getAttribute('data-slide'), 10);
+      track.style.transform = `translateX(-${slideIndex * 25}%)`;
+    });
+  });
+}
+
+// FAQ
 
 faqTabs.forEach(tab => {
   tab.addEventListener('click', () => {
@@ -22,7 +37,7 @@ faqTabs.forEach(tab => {
   });
 });
 
-/* Footer */
+// Footer
 
 tabButtons.forEach(button => {
   button.addEventListener('click', () => {
