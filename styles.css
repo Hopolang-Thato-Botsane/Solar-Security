@@ -306,6 +306,33 @@ body.no-scroll {
 /* ==========================================================
    WHO WE HELP SECTION SYSTEM
    ========================================================== */
+
+@media (min-width: 1025px) {
+  .hero-viewport-frame {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+  }
+
+  .help-section {
+    margin-top: 100vh !important; 
+    position: relative !important;
+    z-index: 2;
+    box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .services-section,
+  .projects-section,
+  .reviews-section,
+  .faq-section,
+  .site-footer {
+    position: relative !important;
+    z-index: 2;
+  }
+}
+
 .help-section {
   background-color: #ffffff;
   color: #000000;
