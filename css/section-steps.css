@@ -1,0 +1,108 @@
+.steps-section {
+    background-color: var(--pristine-cream);
+    padding: 6rem 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.steps-container {
+    width: 90%;
+    max-width: 75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.steps-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.steps-tagline {
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--highveld-gold);
+}
+
+.steps-main-title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 500;
+    color: var(--earth-espresso);
+    letter-spacing: -0.025rem;
+    line-height: 1.2;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.step-card {
+    background-color: var(--earth-espresso);
+    padding: 2.25rem 1.5rem;
+    border-radius: 0.125rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.step-number {
+    font-family: var(--font-body);
+    font-size: 0.688rem;
+    font-weight: 500;
+    color: rgba(253, 251, 247, 0.4);
+    margin-bottom: 0.875rem;
+}
+
+.step-icon-wrapper {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-bottom: 2rem;
+    display: block;
+}
+
+.step-icon {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 1.25rem;
+    max-height: 1.25rem;
+}
+
+.step-icon circle,
+.step-icon polygon {
+    fill: none !important;
+    stroke: #FDFBF7 !important;
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.step-card-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #FDFBF7;
+    margin-bottom: 0.5rem;
+}
+
+.step-card-body {
+    font-family: var(--font-body);
+    font-size: 0.938rem;
+    color: rgba(253, 251, 247, 0.75);
+    line-height: 1.5;
+}
+
+@media (max-width: 64rem) {
+    .steps-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .steps-main-title { font-size: 2rem; }
+}
+
+@media (max-width: 36rem) {
+    .steps-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+    .steps-section { padding: 4rem 0; }
+}
