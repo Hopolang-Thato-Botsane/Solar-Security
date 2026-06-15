@@ -12,7 +12,8 @@
     <link rel="stylesheet" href="css/section-projects.css">
     <link rel="stylesheet" href="css/section-faqs.css">
     <link rel="stylesheet" href="/css/section-footer.css">
-    <title>Document</title>
+    <link rel="stylesheet" href="css/modal.css">
+    <title>Solar&Secure</title>
 </head>
 <body>
 
@@ -201,8 +202,66 @@
 
     </main>
 
+    <dialog class="assessment-modal" id="assessmentModal">
+        <div class="modal-wrapper">
+            
+            <header class="modal-header-nav">
+            <div class="modal-breadcrumbs">Home / <span class="active-crumb">Package</span></div>
+            <button class="modal-close-trigger" aria-label="Close Modal">[ X ]</button>
+            </header>
+
+            <section class="modal-editorial-block">
+            <div class="editorial-title-group">
+                <h2 class="modal-headline modal-headline-target"></h2>
+                <div class="modal-headline-underline"></div>
+            </div>
+            <p class="modal-subtitle modal-subtitle-target"></p>
+            </section>
+
+            <form class="modal-form-matrix" method="dialog" id="assessmentForm">
+            
+            <div class="form-column">
+                <h3 class="column-title">Identity</h3>
+                <div class="input-line-group">
+                <label for="clientName">Client Name:</label>
+                <input type="text" id="clientName" name="clientName" placeholder="Name" required autocomplete="name">
+                </div>
+                <div class="input-line-group">
+                <label for="clientContact">Contact Number/Email:</label>
+                <input type="text" id="clientContact" name="clientContact" placeholder="Contact Number or Email" required>
+                </div>
+                <button type="submit" class="btn-submit-gold modal-btn-target"></button>
+            </div>
+
+            <div class="form-column">
+                <h3 class="column-title">Infrastructure Type</h3>
+                <div class="input-line-group select-wrapper">
+                <label for="serviceType">Service Type:</label>
+                <select id="serviceType" name="serviceType" class="modal-service-select-target" required></select>
+                </div>
+                <div class="input-line-group select-wrapper">
+                <label for="propertyType">Property Type:</label>
+                <select id="propertyType" name="propertyType" class="modal-property-select-target" required></select>
+                </div>
+            </div>
+
+            <div class="form-column">
+                <h3 class="column-title">Urgency & Scheduling</h3>
+                <div class="input-line-group">
+                <label for="assessmentDate">Preferred Assessment Date:</label>
+                <input type="date" id="assessmentDate" name="assessmentDate" required>
+                </div>
+                <div class="input-line-group">
+                <label for="siteLocation">Site Location/Area:</label>
+                <input type="text" id="siteLocation" name="siteLocation" placeholder="e.g. Bryanston, Sandton" required>
+                </div>
+            </div>
+
+            </form>
+        </div>
+    </dialog>
+
     <script src="js/appCMS.js"></script>
-    <script src="js/faq-accordion.js" defer></script>
     <script src="js/switch.js" defer></script>
     <script src="js/reveal.js" defer></script>
 </body>

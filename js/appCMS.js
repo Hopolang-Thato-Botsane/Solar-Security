@@ -1,3 +1,9 @@
+/**
+ * SOLAR AND SECURE - MASTER INTEGRATED CMS & INTERACTION ENGINE
+ * Pure bare-metal JavaScript infrastructure using native fetch().
+ * Integrates dynamic Sanity data delivery with custom lifecycle event delegation handlers.
+ */
+
 const CMS_CONFIG = {
   projectId: 'zmqqi4n3',
   dataset: 'production',
@@ -63,11 +69,19 @@ const GLOBAL_CMS_QUERY = `{
     infrastructureLinks[] { label, urlTarget },
     getInTouchColumnTitle,
     contactDetails[] { detailText, isPhoneType, isMailTo, mailToAddress }
+  },
+  "modal": *[_type == "assessmentModal"][0] {
+    modalHeadline,
+    modalSubtitle,
+    serviceOptions,
+    propertyOptions,
+    submitButtonLabel
   }
 }`;
 
 const SANITY_API_URL = `https://${CMS_CONFIG.projectId}.api.sanity.io/${CMS_CONFIG.apiVersion}/data/query/${CMS_CONFIG.dataset}?query=${encodeURIComponent(GLOBAL_CMS_QUERY)}`;
 
+// Master pipeline trigger on content availability
 document.addEventListener('DOMContentLoaded', () => {
   executeContentPipeline();
 });
@@ -84,6 +98,7 @@ function executeContentPipeline() {
       const data = payload.result;
       if (!data) return;
 
+      // Component execution chain
       if (data.hero) {
         paintBrandingAndNav(data.hero.branding, data.hero.navigationLinks);
         paintHeroTypography(data.hero.mainHeading, data.hero.subHeading);
@@ -95,6 +110,10 @@ function executeContentPipeline() {
       if (data.projects) paintProjectsMatrix(data.projects);
       if (data.faq) paintFAQMatrix(data.faq);
       if (data.footer) paintFooterMatrix(data.footer);
+      if (data.modal) paintAssessmentModalMatrix(data.modal);
+
+      // Initialize native modal toggles and interaction overlays
+      initModalInteractions();
 
       console.log('[CMS ENGINE]: Structural initialization execution complete.');
     })
@@ -102,6 +121,12 @@ function executeContentPipeline() {
       console.error('[CMS ENGINE]: Operational failure on component assembly execution:', error);
     });
 }
+
+/**
+ * ============================================================================
+ * CORE UI DOM PAINTERS
+ * ============================================================================
+ */
 
 function paintBrandingAndNav(brandTitle, linksArray) {
   const brandingTarget = document.querySelector('.brand-title-target');
@@ -428,6 +453,86 @@ function paintFooterMatrix(footerData) {
       }
       
       contactDetailsList.appendChild(li);
+    });
+  }
+}
+
+function paintAssessmentModalMatrix(modalData) {
+  const headlineTarget = document.querySelector('.modal-headline-target');
+  const subtitleTarget = document.querySelector('.modal-subtitle-target');
+  const buttonTarget = document.querySelector('.modal-btn-target');
+
+  if (headlineTarget && modalData.modalHeadline) {
+    headlineTarget.innerHTML = modalData.modalHeadline.replace('\n', '<br>');
+  }
+  if (subtitleTarget && modalData.modalSubtitle) subtitleTarget.textContent = modalData.modalSubtitle;
+  if (buttonTarget && modalData.submitButtonLabel) buttonTarget.textContent = modalData.submitButtonLabel;
+
+  const serviceSelect = document.querySelector('.modal-service-select-target');
+  if (serviceSelect && modalData.serviceOptions && modalData.serviceOptions.length > 0) {
+    serviceSelect.innerHTML = '<option value="" disabled selected hidden>Pick A Service</option>';
+    modalData.serviceOptions.forEach(optionText => {
+      const option = document.createElement('option');
+      option.value = optionText.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      option.textContent = optionText;
+      serviceSelect.appendChild(option);
+    });
+  }
+
+  const propertySelect = document.querySelector('.modal-property-select-target');
+  if (propertySelect && modalData.propertyOptions && modalData.propertyOptions.length > 0) {
+    propertySelect.innerHTML = '<option value="" disabled selected hidden>Select Property Scale</option>';
+    modalData.propertyOptions.forEach(optionText => {
+      const option = document.createElement('option');
+      option.value = optionText.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      option.textContent = optionText;
+      propertySelect.appendChild(option);
+    });
+  }
+}
+
+/**
+ * ============================================================================
+ * INTERACTION LOGIC & SYSTEM EVENT OVERLAYS
+ * ============================================================================
+ */
+
+function initModalInteractions() {
+  const modalElement = document.getElementById('assessmentModal');
+  const openTriggerButtons = document.querySelectorAll('a[href="#assessment"], a[href="#consult"], .btn-baseline-gold, .btn-primary-gold');
+  const closeTriggerButton = document.querySelector('.modal-close-trigger');
+  const targetForm = document.getElementById('assessmentForm');
+
+  openTriggerButtons.forEach(btn => {
+    btn.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (modalElement) {
+        modalElement.showModal();
+        document.body.style.overflow = 'hidden';
+      }
+    });
+  });
+
+  if (closeTriggerButton && modalElement) {
+    closeTriggerButton.addEventListener('click', () => {
+      modalElement.close();
+    });
+
+    modalElement.addEventListener('close', () => {
+      document.body.style.overflow = '';
+    });
+  }
+
+  if (targetForm) {
+    targetForm.addEventListener('submit', (event) => {
+      console.log('[MODAL ENGINE]: Verification clear. Transmission packet created.', {
+        name: document.getElementById('clientName').value,
+        contact: document.getElementById('clientContact').value,
+        service: document.getElementById('serviceType').value,
+        property: document.getElementById('propertyType').value,
+        date: document.getElementById('assessmentDate').value,
+        location: document.getElementById('siteLocation').value
+      });
     });
   }
 }

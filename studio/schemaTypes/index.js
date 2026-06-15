@@ -4,6 +4,7 @@ import services from "./services";
 import projects from "./projects";
 import faqs from "./faqs";
 import footer from "./footer";
+import assessmentModal from "./assessmentModal";
 
 export const schemaTypes = [
     hero,
@@ -11,5 +12,6 @@ export const schemaTypes = [
     services,
     projects,
     faqs,
-    footer
+    footer,
+    assessmentModal,
 ]
