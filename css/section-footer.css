@@ -16,7 +16,7 @@
 .footer-cta-zone {
   position: relative;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, var(--absolute-black) 100%), 
-              url('../public/security-camera-bg.jpg') center/cover no-repeat;
+              center/cover no-repeat;
   padding-top: 160px;
   padding-bottom: 140px;
   text-align: center;

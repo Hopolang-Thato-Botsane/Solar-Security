@@ -1,17 +1,9 @@
-/**
- * SOLAR AND SECURE - CORE CMS ENGINE (VERIFIED V4)
- * Pure bare-metal JavaScript infrastructure using native fetch().
- * Updated to support precise schema fields: sectionMiniHeading and sectionDescription.
- */
-
-// 1. SYSTEM GATEWAY CONFIGURATION
 const CMS_CONFIG = {
   projectId: 'zmqqi4n3',
   dataset: 'production',
   apiVersion: 'v2026-06-14'
 };
 
-// 2. UNIFIED GLOBAL GROQ QUERY
 const GLOBAL_CMS_QUERY = `{
   "hero": *[_type == "hero"][0] {
     branding,
@@ -38,30 +30,32 @@ const GLOBAL_CMS_QUERY = `{
       "iconUrl": serviceIcon.asset->url,
       "imageUrl": cardImage.asset->url
     }
+  },
+  "projects": *[_type == "projectsSection"][0] {
+    sectionMiniHeading,
+    sectionHeading,
+    sectionDescription,
+    projectsList[] {
+      projectTitle,
+      projectLocation,
+      projectSpecs,
+      "imageUrl": projectImage.asset->url
+    }
   }
 }`;
 
-// 3. SECURE ENDPOINT COMPILATION
 const SANITY_API_URL = `https://${CMS_CONFIG.projectId}.api.sanity.io/${CMS_CONFIG.apiVersion}/data/query/${CMS_CONFIG.dataset}?query=${encodeURIComponent(GLOBAL_CMS_QUERY)}`;
 
-/**
- * LIFECYCLE INITIALIZER
- */
 document.addEventListener('DOMContentLoaded', () => {
   executeContentPipeline();
 });
 
-/**
- * CENTRAL NETWORK HANDSHAKE AND ROUTING ENGINE
- */
 function executeContentPipeline() {
   console.log('[CMS ENGINE]: Dispatching data synchronization packet to Sanity CDN...');
 
   fetch(SANITY_API_URL)
     .then(response => {
-      if (!response.ok) {
-        throw new Error(`Sanity network handshake rejected. HTTP Status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Sanity handshake rejected: ${response.status}`);
       return response.json();
     })
     .then(payload => {
@@ -70,36 +64,22 @@ function executeContentPipeline() {
 
       console.log('[CMS ENGINE]: Data payload safely extracted. Starting UI paint sequences...');
 
-      // PIER 1: HERO CANVAS LAYER
       if (data.hero) {
         paintBrandingAndNav(data.hero.branding, data.hero.navigationLinks);
         paintHeroTypography(data.hero.mainHeading, data.hero.subHeading);
         paintActionTriggers(data.hero.primaryCTA, data.hero.secondaryCTA);
         paintVisualSurfaces(data.hero.bgImageUrl);
       }
+      if (data.process) paintProcessMatrix(data.process);
+      if (data.services) paintServicesMatrix(data.services);
+      if (data.projects) paintProjectsMatrix(data.projects);
 
-      // PIER 2: PROCESS STEP GRID LAYER
-      if (data.process) {
-        paintProcessMatrix(data.process);
-      }
-
-      // PIER 3: SERVICES INTERACTIVE GRID LAYER
-      if (data.services) {
-        paintServicesMatrix(data.services);
-      }
-
-      console.log('[CMS ENGINE]: All fields synced completely.');
+      console.log('[CMS ENGINE]: All system layers synchronized completely.');
     })
     .catch(error => {
       console.error('[CMS ENGINE]: Critical structural crash during pipeline fetch execution:', error);
     });
 }
-
-/**
- * ============================================================================
- * UI PAINT TERMINALS (NATIVE DOM MANIPULATION)
- * ============================================================================
- */
 
 function paintBrandingAndNav(brandTitle, linksArray) {
   const brandingTarget = document.querySelector('.brand-title-target');
@@ -176,7 +156,6 @@ function paintServicesMatrix(servicesData) {
   const titleTarget = document.querySelector('.services-title-target');
   const leadTarget = document.querySelector('.services-lead-target');
 
-  // Updated to look up the exact keys from your schema array packet
   if (miniTarget && servicesData.sectionMiniHeading) miniTarget.textContent = servicesData.sectionMiniHeading;
   if (titleTarget && servicesData.sectionHeading) titleTarget.textContent = servicesData.sectionHeading;
   if (leadTarget && servicesData.sectionDescription) leadTarget.textContent = servicesData.sectionDescription;
@@ -184,16 +163,12 @@ function paintServicesMatrix(servicesData) {
   const gridTarget = document.querySelector('.services-grid-target');
   if (gridTarget && servicesData.servicesList && servicesData.servicesList.length > 0) {
     gridTarget.innerHTML = '';
-
     servicesData.servicesList.forEach(service => {
       const card = document.createElement('div');
       card.className = 'service-reveal-card';
-
       const bgMask = document.createElement('div');
       bgMask.className = 'card-bg-mask';
-      if (service.imageUrl) {
-        bgMask.style.backgroundImage = `url('${service.imageUrl}')`;
-      }
+      if (service.imageUrl) bgMask.style.backgroundImage = `url('${service.imageUrl}')`;
       card.appendChild(bgMask);
 
       const shield = document.createElement('div');
@@ -213,7 +188,6 @@ function paintServicesMatrix(servicesData) {
       const h3 = document.createElement('h3');
       h3.className = 'service-card-title';
       h3.textContent = service.serviceName || '';
-
       const p = document.createElement('p');
       p.className = 'service-card-description';
       p.textContent = service.serviceDescription || '';
@@ -221,8 +195,72 @@ function paintServicesMatrix(servicesData) {
       shield.appendChild(h3);
       shield.appendChild(p);
       card.appendChild(shield);
-
       gridTarget.appendChild(card);
+    });
+  }
+}
+
+function paintProjectsMatrix(projectsData) {
+  const miniTarget = document.querySelector('.projects-mini-target');
+  const titleTarget = document.querySelector('.projects-title-target');
+  const leadTarget = document.querySelector('.projects-lead-target');
+
+  if (miniTarget && projectsData.sectionMiniHeading) miniTarget.textContent = projectsData.sectionMiniHeading;
+  if (titleTarget && projectsData.sectionHeading) titleTarget.textContent = projectsData.sectionHeading;
+  if (leadTarget && projectsData.sectionDescription) leadTarget.textContent = projectsData.sectionDescription;
+
+  const gridTarget = document.querySelector('.projects-grid-target');
+  if (gridTarget && projectsData.projectsList && projectsData.projectsList.length > 0) {
+    gridTarget.innerHTML = '';
+
+    projectsData.projectsList.forEach(project => {
+      const article = document.createElement('article');
+      article.className = 'project-card';
+
+      const imgWrapper = document.createElement('div');
+      imgWrapper.className = 'card-image-wrapper';
+      const img = document.createElement('img');
+      img.src = project.imageUrl || '';
+      img.alt = project.projectTitle || '';
+      img.loading = 'lazy';
+      imgWrapper.appendChild(img);
+
+      const meta = document.createElement('div');
+      meta.className = 'card-meta';
+
+      const h3 = document.createElement('h3');
+      h3.className = 'card-title';
+      h3.textContent = project.projectTitle || '';
+
+      const pLoc = document.createElement('p');
+      pLoc.className = 'card-location';
+      pLoc.textContent = project.projectLocation || '';
+
+      const specsList = document.createElement('ul');
+      specsList.className = 'card-specs-list';
+
+      if (project.projectSpecs && project.projectSpecs.length > 0) {
+        project.projectSpecs.forEach(specText => {
+          const liSpec = document.createElement('li');
+          liSpec.className = 'spec-list-item'; 
+          liSpec.innerHTML = `
+            <svg class="spec-tick-icon" viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor; margin-right:8px; display:inline-block; vertical-align:middle;">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <span class="spec-text-node" style="display:inline-block; vertical-align:middle;">${specText}</span>
+          `;
+          specsList.appendChild(liSpec);
+        });
+      }
+
+      meta.appendChild(h3);
+      meta.appendChild(pLoc);
+      meta.appendChild(specsList);
+      
+      article.appendChild(imgWrapper);
+      article.appendChild(meta);
+
+      gridTarget.appendChild(article);
     });
   }
 }

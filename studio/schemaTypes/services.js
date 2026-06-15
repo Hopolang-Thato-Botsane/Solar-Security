@@ -18,12 +18,12 @@ export default {
         type: "string",
         title: "Introduction Description"
       },
-    {
-      name: 'servicesList',
-      type: 'array',
-      title: 'Services Cards List',
-      description: 'Add, remove, and reorder your property service cards.',
-      of: [
+      {
+        name: 'servicesList',
+        type: 'array',
+        title: 'Services Cards List',
+        description: 'Add, remove, and reorder your property service cards.',
+        of: [
         {
           type: 'object',
           name: 'serviceCard',
