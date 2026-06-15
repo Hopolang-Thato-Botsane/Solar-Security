@@ -41,6 +41,13 @@ const GLOBAL_CMS_QUERY = `{
       projectSpecs,
       "imageUrl": projectImage.asset->url
     }
+  },
+  "faq": *[_type == "faqSection"][0] {
+    sectionMiniHeading,
+    sectionHeading,
+    sectionDescription,
+    ctaLabel,
+    faqList[] { question, answer }
   }
 }`;
 
@@ -55,15 +62,14 @@ function executeContentPipeline() {
 
   fetch(SANITY_API_URL)
     .then(response => {
-      if (!response.ok) throw new Error(`Sanity handshake rejected: ${response.status}`);
+      if (!response.ok) throw new Error(`Sanity status rejection: ${response.status}`);
       return response.json();
     })
     .then(payload => {
       const data = payload.result;
       if (!data) return;
 
-      console.log('[CMS ENGINE]: Data payload safely extracted. Starting UI paint sequences...');
-
+      // Component execution chain
       if (data.hero) {
         paintBrandingAndNav(data.hero.branding, data.hero.navigationLinks);
         paintHeroTypography(data.hero.mainHeading, data.hero.subHeading);
@@ -73,11 +79,12 @@ function executeContentPipeline() {
       if (data.process) paintProcessMatrix(data.process);
       if (data.services) paintServicesMatrix(data.services);
       if (data.projects) paintProjectsMatrix(data.projects);
+      if (data.faq) paintFAQMatrix(data.faq);
 
-      console.log('[CMS ENGINE]: All system layers synchronized completely.');
+      console.log('[CMS ENGINE]: Structural initialization execution complete.');
     })
     .catch(error => {
-      console.error('[CMS ENGINE]: Critical structural crash during pipeline fetch execution:', error);
+      console.error('[CMS ENGINE]: Operational failure on component assembly execution:', error);
     });
 }
 
@@ -212,7 +219,6 @@ function paintProjectsMatrix(projectsData) {
   const gridTarget = document.querySelector('.projects-grid-target');
   if (gridTarget && projectsData.projectsList && projectsData.projectsList.length > 0) {
     gridTarget.innerHTML = '';
-
     projectsData.projectsList.forEach(project => {
       const article = document.createElement('article');
       article.className = 'project-card';
@@ -242,7 +248,7 @@ function paintProjectsMatrix(projectsData) {
       if (project.projectSpecs && project.projectSpecs.length > 0) {
         project.projectSpecs.forEach(specText => {
           const liSpec = document.createElement('li');
-          liSpec.className = 'spec-list-item'; 
+          liSpec.className = 'spec-list-item';
           liSpec.innerHTML = `
             <svg class="spec-tick-icon" viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor; margin-right:8px; display:inline-block; vertical-align:middle;">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -256,11 +262,126 @@ function paintProjectsMatrix(projectsData) {
       meta.appendChild(h3);
       meta.appendChild(pLoc);
       meta.appendChild(specsList);
-      
       article.appendChild(imgWrapper);
       article.appendChild(meta);
-
       gridTarget.appendChild(article);
     });
   }
+}
+
+function paintFAQMatrix(faqData) {
+  const miniTarget = document.querySelector('.faq-mini-target');
+  const titleTarget = document.querySelector('.faq-title-target');
+  const leadTarget = document.querySelector('.faq-lead-target');
+  const ctaTarget = document.querySelector('.faq-cta-target');
+
+  if (miniTarget && faqData.sectionMiniHeading) miniTarget.textContent = faqData.sectionMiniHeading;
+  if (titleTarget && faqData.sectionHeading) titleTarget.textContent = faqData.sectionHeading;
+  if (leadTarget && faqData.sectionDescription) leadTarget.textContent = faqData.sectionDescription;
+  if (ctaTarget && faqData.ctaLabel) ctaTarget.textContent = faqData.ctaLabel;
+
+  const wrapperTarget = document.querySelector('.faq-wrapper-target');
+  if (wrapperTarget && faqData.faqList && faqData.faqList.length > 0) {
+    wrapperTarget.innerHTML = '';
+
+    faqData.faqList.forEach((item, index) => {
+      const serialIndex = String(index + 1).padStart(2, '0');
+      
+      const accordionItem = document.createElement('details');
+      accordionItem.className = 'faq-accordion-item';
+
+      accordionItem.name = 'faq-group';
+
+      if (index === 0) {
+        accordionItem.setAttribute('open', '');
+      }
+
+      const summaryTrigger = document.createElement('summary');
+      summaryTrigger.className = 'faq-trigger';
+
+      const qSpan = document.createElement('span');
+      qSpan.className = 'faq-question';
+      qSpan.textContent = `${serialIndex} / ${item.question || ''}`;
+
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'faq-status-icon';
+
+      summaryTrigger.appendChild(qSpan);
+      summaryTrigger.appendChild(iconSpan);
+
+      const panel = document.createElement('div');
+      panel.className = 'faq-content-panel';
+
+      const inner = document.createElement('div');
+      inner.className = 'faq-content-inner';
+
+      const p = document.createElement('p');
+      p.textContent = item.answer || '';
+
+      inner.appendChild(p);
+      panel.appendChild(inner);
+      
+      accordionItem.appendChild(summaryTrigger);
+      accordionItem.appendChild(panel);
+      wrapperTarget.appendChild(accordionItem);
+    });
+
+    if (typeof initFaqScrollReveal === 'function') {
+      initFaqScrollReveal();
+    }
+  }
+}
+
+function initFaqAccordion() {
+  const accordionWrapper = document.querySelector(".faq-accordion-wrapper");
+  if (!accordionWrapper) return;
+
+  accordionWrapper.addEventListener("click", (event) => {
+    const trigger = event.target.closest(".faq-trigger");
+    if (!trigger) return;
+
+    const currentItem = trigger.closest(".faq-accordion-item");
+    if (!currentItem) return;
+
+    const isActive = currentItem.classList.contains("active");
+
+    const allItems = accordionWrapper.querySelectorAll(".faq-accordion-item");
+    allItems.forEach((item) => {
+      if (item !== currentItem) {
+        item.classList.remove("active");
+        const panelBtn = item.querySelector(".faq-trigger");
+        if (panelBtn) panelBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    if (isActive) {
+      currentItem.classList.remove("active");
+      trigger.setAttribute("aria-expanded", "false");
+    } else {
+      currentItem.classList.add("active");
+      trigger.setAttribute("aria-expanded", "true");
+    }
+  });
+}
+
+function initFaqScrollReveal() {
+  const revealTarget = document.querySelector(".reveal-on-scroll");
+  if (!revealTarget) return;
+
+  const configOptions = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 0.15
+  };
+
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, configOptions);
+
+  revealObserver.observe(revealTarget);
 }

@@ -1,3 +1,8 @@
+/* ============================================================================
+ * FAQ CORE MODULE - PURE CSS DISCLOSURE LAYOUT ARCHITECTURE
+ * ============================================================================
+ */
+
 .faq-section {
   background-color: var(--absolute-black);
   color: var(--pure-white);
@@ -81,6 +86,7 @@
   transform: translateY(-1px);
 }
 
+/* SCROLL REVEAL WRAPPER ASSEMBLY */
 .faq-accordion-wrapper {
   flex: 1 1 65%;
   display: flex;
@@ -96,10 +102,13 @@
   transform: translateY(0);
 }
 
+/* NATIVE ELEMENT CONTAINER WRAPPER */
 .faq-accordion-item {
   border-bottom: 2px solid var(--brand-gold);
+  display: block; /* Ensures details layout expands uniformly */
 }
 
+/* DYNAMIC SUMMARY OVERRIDES REPLACING BUTTON HOOKS */
 .faq-trigger {
   width: 100%;
   display: flex;
@@ -113,6 +122,12 @@
   text-align: left;
   color: var(--pure-white);
   gap: 24px;
+  list-style: none; /* Kills browser reveal arrow on Chrome/Firefox/Edge */
+}
+
+/* Kills disclosure block summary marker on Safari builds */
+.faq-trigger::-webkit-details-marker {
+  display: none;
 }
 
 .faq-question {
@@ -127,6 +142,7 @@
   color: var(--brand-gold);
 }
 
+/* PREMIUM PLUS MINUS GRAPHIC TRANSITION ASSEMBLY */
 .faq-status-icon {
   position: relative;
   width: 16px;
@@ -158,20 +174,21 @@
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Rotates vertical mask segment completely out of view to leave a clean minus bar */
-.faq-accordion-item.active .faq-status-icon::after {
-  transform: scaleY(0);
+/* TARGETS OPEN STATE DIRECTLY VIA CSS ATTRIBUTES EXCLUSIVELY */
+.faq-accordion-item[open] .faq-status-icon::after {
+  transform: scaleY(0); /* Rotates structural center line out of vision smoothly */
 }
 
-/* --- HIDE/SHOW EXPANSION PANEL LAYOUT --- */
+/* NATIVE AUTO-HEIGHT TRANSITION MECHANICS */
 .faq-content-panel {
   display: grid;
-  grid-template-rows: 0fr; /* Zero vertical height track calculation base */
+  grid-template-rows: 0fr;
   transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.faq-accordion-item.active .faq-content-panel {
-  grid-template-rows: 1fr; /* Animates to full natural content height effortlessly */
+/* Seamlessly targets inner track reveal when open state mounts */
+.faq-accordion-item[open] .faq-content-panel {
+  grid-template-rows: 1fr;
 }
 
 .faq-content-inner {
@@ -188,6 +205,7 @@
   max-width: 680px;
 }
 
+/* RESPONSIVE LAYOUT BREAKPOINTS */
 @media (max-width: 991px) {
   .faq-container {
     flex-direction: column;
