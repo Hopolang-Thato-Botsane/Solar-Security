@@ -48,6 +48,21 @@ const GLOBAL_CMS_QUERY = `{
     sectionDescription,
     ctaLabel,
     faqList[] { question, answer }
+  },
+  "footer": *[_type == "footerSection"][0] {
+    ctaTitle,
+    ctaSubtitle,
+    ctaLabel,
+    "bgImageUrl": ctaBackgroundImage.asset->url,
+    brandName,
+    brandDescription,
+    socialLinks[] { platform, urlTarget, inlineSvgRaw },
+    navigationColumnTitle,
+    navigationLinks[] { label, urlTarget },
+    infrastructureColumnTitle,
+    infrastructureLinks[] { label, urlTarget },
+    getInTouchColumnTitle,
+    contactDetails[] { detailText, isPhoneType, isMailTo, mailToAddress }
   }
 }`;
 
@@ -69,7 +84,6 @@ function executeContentPipeline() {
       const data = payload.result;
       if (!data) return;
 
-      // Component execution chain
       if (data.hero) {
         paintBrandingAndNav(data.hero.branding, data.hero.navigationLinks);
         paintHeroTypography(data.hero.mainHeading, data.hero.subHeading);
@@ -80,6 +94,7 @@ function executeContentPipeline() {
       if (data.services) paintServicesMatrix(data.services);
       if (data.projects) paintProjectsMatrix(data.projects);
       if (data.faq) paintFAQMatrix(data.faq);
+      if (data.footer) paintFooterMatrix(data.footer);
 
       console.log('[CMS ENGINE]: Structural initialization execution complete.');
     })
@@ -289,7 +304,6 @@ function paintFAQMatrix(faqData) {
       
       const accordionItem = document.createElement('details');
       accordionItem.className = 'faq-accordion-item';
-
       accordionItem.name = 'faq-group';
 
       if (index === 0) {
@@ -332,36 +346,90 @@ function paintFAQMatrix(faqData) {
   }
 }
 
-function initFaqAccordion() {
-  const accordionWrapper = document.querySelector(".faq-accordion-wrapper");
-  if (!accordionWrapper) return;
+function paintFooterMatrix(footerData) {
+  const titleTarget = document.querySelector('.footer-title-target');
+  const subtitleTarget = document.querySelector('.footer-subtitle-target');
+  const ctaTarget = document.querySelector('.footer-cta-target');
+  const brandTarget = document.querySelector('.footer-brand-target');
+  const descTarget = document.querySelector('.footer-desc-target');
+  const canvasTarget = document.querySelector('.footer-canvas-target');
 
-  accordionWrapper.addEventListener("click", (event) => {
-    const trigger = event.target.closest(".faq-trigger");
-    if (!trigger) return;
+  if (titleTarget && footerData.ctaTitle) titleTarget.textContent = footerData.ctaTitle;
+  if (subtitleTarget && footerData.ctaSubtitle) subtitleTarget.textContent = footerData.ctaSubtitle;
+  if (ctaTarget && footerData.ctaLabel) ctaTarget.textContent = footerData.ctaLabel;
+  if (brandTarget && footerData.brandName) brandTarget.textContent = footerData.brandName;
+  if (descTarget && footerData.brandDescription) descTarget.textContent = footerData.brandDescription;
 
-    const currentItem = trigger.closest(".faq-accordion-item");
-    if (!currentItem) return;
+  if (canvasTarget && footerData.bgImageUrl) {
+    canvasTarget.style.backgroundImage = `url('${footerData.bgImageUrl}')`;
+  }
 
-    const isActive = currentItem.classList.contains("active");
-
-    const allItems = accordionWrapper.querySelectorAll(".faq-accordion-item");
-    allItems.forEach((item) => {
-      if (item !== currentItem) {
-        item.classList.remove("active");
-        const panelBtn = item.querySelector(".faq-trigger");
-        if (panelBtn) panelBtn.setAttribute("aria-expanded", "false");
-      }
+  const socialRowTarget = document.querySelector('.footer-social-row-target');
+  if (socialRowTarget && footerData.socialLinks && footerData.socialLinks.length > 0) {
+    socialRowTarget.innerHTML = '';
+    footerData.socialLinks.forEach(social => {
+      const a = document.createElement('a');
+      a.href = social.urlTarget || '#';
+      a.className = 'social-link';
+      a.setAttribute('aria-label', social.platform || 'Social Link');
+      a.innerHTML = social.inlineSvgRaw || '';
+      socialRowTarget.appendChild(a);
     });
+  }
 
-    if (isActive) {
-      currentItem.classList.remove("active");
-      trigger.setAttribute("aria-expanded", "false");
-    } else {
-      currentItem.classList.add("active");
-      trigger.setAttribute("aria-expanded", "true");
-    }
-  });
+  const navColTitle = document.querySelector('.footer-nav-title-target');
+  const navLinksList = document.querySelector('.footer-nav-links-target');
+  if (navColTitle && footerData.navigationColumnTitle) navColTitle.textContent = footerData.navigationColumnTitle;
+  if (navLinksList && footerData.navigationLinks && footerData.navigationLinks.length > 0) {
+    navLinksList.innerHTML = '';
+    footerData.navigationLinks.forEach(link => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = link.urlTarget || '#';
+      a.textContent = link.label || '';
+      li.appendChild(a);
+      navLinksList.appendChild(li);
+    });
+  }
+
+  const infraColTitle = document.querySelector('.footer-infra-title-target');
+  const infraLinksList = document.querySelector('.footer-infra-links-target');
+  if (infraColTitle && footerData.infrastructureColumnTitle) infraColTitle.textContent = footerData.infrastructureColumnTitle;
+  if (infraLinksList && footerData.infrastructureLinks && footerData.infrastructureLinks.length > 0) {
+    infraLinksList.innerHTML = '';
+    footerData.infrastructureLinks.forEach(link => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = link.urlTarget || '#';
+      a.textContent = link.label || '';
+      li.appendChild(a);
+      infraLinksList.appendChild(li);
+    });
+  }
+
+  const touchColTitle = document.querySelector('.footer-touch-title-target');
+  const contactDetailsList = document.querySelector('.footer-contact-target');
+  if (touchColTitle && footerData.getInTouchColumnTitle) touchColTitle.textContent = footerData.getInTouchColumnTitle;
+  if (contactDetailsList && footerData.contactDetails && footerData.contactDetails.length > 0) {
+    contactDetailsList.innerHTML = '';
+    footerData.contactDetails.forEach(detail => {
+      const li = document.createElement('li');
+      
+      if (detail.isPhoneType) {
+        li.className = 'phone-item';
+        li.textContent = detail.detailText || '';
+      } else if (detail.isMailTo) {
+        const a = document.createElement('a');
+        a.href = `mailto:${detail.mailToAddress || detail.detailText}`;
+        a.textContent = detail.detailText || '';
+        li.appendChild(a);
+      } else {
+        li.textContent = detail.detailText || '';
+      }
+      
+      contactDetailsList.appendChild(li);
+    });
+  }
 }
 
 function initFaqScrollReveal() {
