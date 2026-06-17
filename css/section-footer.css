@@ -22,7 +22,6 @@
   background-color: var(--absolute-black);
 }
 
-/* Pseudo-element stack layer to hold the background asset safely */
 .footer-cta-zone::before {
   content: '';
   position: absolute;
