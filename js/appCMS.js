@@ -73,10 +73,9 @@ const GLOBAL_CMS_QUERY = `{
   }
 }`;
 
-// Fixed: Added mandatory 'v' prefix before API version string required by Sanity API routers
 const SANITY_API_URL = `https://${CMS_CONFIG.projectId}.api.sanity.io/v${CMS_CONFIG.apiVersion}/data/query/${CMS_CONFIG.dataset}?query=${encodeURIComponent(GLOBAL_CMS_QUERY)}`;
 
-// Internal state fallback to guarantee content rendering if Sanity CDN returns 403 or network failure
+// Emergency static data layer
 const LOCAL_FALLBACK_DATA = {
   hero: {
     branding: "SOLAR & SECURE",
@@ -117,28 +116,27 @@ document.addEventListener('DOMContentLoaded', () => {
   executeContentPipeline();
 });
 
-function executeContentPipeline() {
+async function executeContentPipeline() {
   console.log('[CMS ENGINE]: Dispatching data synchronization packet to Sanity CDN...');
 
-  fetch(SANITY_API_URL)
-    .then(response => {
-      if (!response.ok) throw new Error(`Sanity status rejection: ${response.status}`);
-      return response.json();
-    })
-    .then(payload => {
-      const data = payload.result;
-      if (!data) throw new Error('Null payload received from Sanity CDN');
+  try {
+    const response = await fetch(SANITY_API_URL);
+    if (!response.ok) throw new Error(`Sanity HTTP rejection: ${response.status}`);
+    
+    const payload = await response.json();
+    if (!payload || !payload.result) throw new Error('Invalid or empty payload structure');
 
-      renderSiteContent(data);
-      console.log('[CMS ENGINE]: Structural initialization execution complete.');
-    })
-    .catch(error => {
-      console.warn('[CMS ENGINE]: Network pipeline failure. Initializing emergency local fallback state:', error);
-      renderSiteContent(LOCAL_FALLBACK_DATA);
-    });
+    renderSiteContent(payload.result);
+    console.log('[CMS ENGINE]: Structural initialization execution complete.');
+  } catch (error) {
+    console.warn('[CMS ENGINE]: Sanity live sync failed. Executing fallback paint protocol:', error);
+    renderSiteContent(LOCAL_FALLBACK_DATA);
+  }
 }
 
 function renderSiteContent(data) {
+  if (!data) return;
+
   if (data.hero) {
     paintBrandingAndNav(data.hero.branding, data.hero.navigationLinks);
     paintHeroTypography(data.hero.mainHeading, data.hero.subHeading);
@@ -165,9 +163,9 @@ function paintBrandingAndNav(brandTitle, linksArray) {
     linksArray.forEach((link, index) => {
       const li = document.createElement('li');
       const a = document.createElement('a');
-      a.href = link.urlTarget;
+      a.href = link.urlTarget || '#';
       a.className = `nav-link ${index === 0 ? 'active' : ''}`;
-      a.textContent = link.label;
+      a.textContent = link.label || '';
       li.appendChild(a);
       navTarget.appendChild(li);
     });
@@ -517,12 +515,6 @@ function paintAssessmentModalMatrix(modalData) {
     });
   }
 }
-
-/**
- * ============================================================================
- * INTERACTION LOGIC & SYSTEM EVENT OVERLAYS
- * ============================================================================
- */
 
 function initModalInteractions() {
   const modalElement = document.getElementById('assessmentModal');
