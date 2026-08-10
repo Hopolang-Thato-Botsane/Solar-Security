@@ -73,7 +73,45 @@ const GLOBAL_CMS_QUERY = `{
   }
 }`;
 
-const SANITY_API_URL = `https://${CMS_CONFIG.projectId}.api.sanity.io/${CMS_CONFIG.apiVersion}/data/query/${CMS_CONFIG.dataset}?query=${encodeURIComponent(GLOBAL_CMS_QUERY)}`;
+// Fixed: Added mandatory 'v' prefix before API version string required by Sanity API routers
+const SANITY_API_URL = `https://${CMS_CONFIG.projectId}.api.sanity.io/v${CMS_CONFIG.apiVersion}/data/query/${CMS_CONFIG.dataset}?query=${encodeURIComponent(GLOBAL_CMS_QUERY)}`;
+
+// Internal state fallback to guarantee content rendering if Sanity CDN returns 403 or network failure
+const LOCAL_FALLBACK_DATA = {
+  hero: {
+    branding: "SOLAR & SECURE",
+    navigationLinks: [
+      { label: "Overview", urlTarget: "#hero" },
+      { label: "Services", urlTarget: "#services" },
+      { label: "Projects", urlTarget: "#projects" },
+      { label: "FAQ", urlTarget: "#faq" }
+    ],
+    mainHeading: "SOLAR AND SECURE",
+    subHeading: "OFF-GRID RESILIENCE. ZERO DOWNTIME.",
+    primaryCTA: "ENGAGE GRID",
+    secondaryCTA: "REQUEST ASSESSMENT"
+  },
+  process: {
+    sectionMiniHeading: "DEPLOYMENT MATRIX",
+    sectionHeading: "SYSTEM ARCHITECTURE & INTEGRATION",
+    sectionDescription: "Structured protocol for deploying autonomous energy units.",
+    processCards: [
+      { cardNumber: "01", cardHeading: "Site Telemetry", cardDescription: "Comprehensive load profile & solar radiance assessment." },
+      { cardNumber: "02", cardHeading: "Grid Deployment", cardDescription: "Installation of modular solar arrays and battery reserves." },
+      { cardNumber: "03", cardHeading: "Live Monitoring", cardDescription: "24/7 telemetry tracking and encrypted remote control." }
+    ]
+  },
+  services: {
+    sectionMiniHeading: "CAPABILITIES",
+    sectionHeading: "ENGINEERED RESILIENCE",
+    sectionDescription: "Tailored micro-grid solutions for critical infrastructure.",
+    servicesList: [
+      { serviceName: "Commercial Solar Arrays", serviceDescription: "High-yield photovoltaic installations for enterprise sites." },
+      { serviceName: "Battery Energy Storage (BESS)", serviceDescription: "Industrial lithium-iron phosphate storage matrices." },
+      { serviceName: "Encrypted Telemetry", serviceDescription: "Real-time hardware monitoring and zero-latency alerts." }
+    ]
+  }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   executeContentPipeline();
@@ -89,28 +127,32 @@ function executeContentPipeline() {
     })
     .then(payload => {
       const data = payload.result;
-      if (!data) return;
+      if (!data) throw new Error('Null payload received from Sanity CDN');
 
-      if (data.hero) {
-        paintBrandingAndNav(data.hero.branding, data.hero.navigationLinks);
-        paintHeroTypography(data.hero.mainHeading, data.hero.subHeading);
-        paintActionTriggers(data.hero.primaryCTA, data.hero.secondaryCTA);
-        paintVisualSurfaces(data.hero.bgImageUrl);
-      }
-      if (data.process) paintProcessMatrix(data.process);
-      if (data.services) paintServicesMatrix(data.services);
-      if (data.projects) paintProjectsMatrix(data.projects);
-      if (data.faq) paintFAQMatrix(data.faq);
-      if (data.footer) paintFooterMatrix(data.footer);
-      if (data.modal) paintAssessmentModalMatrix(data.modal);
-
-      initModalInteractions();
-
+      renderSiteContent(data);
       console.log('[CMS ENGINE]: Structural initialization execution complete.');
     })
     .catch(error => {
-      console.error('[CMS ENGINE]: Operational failure on component assembly execution:', error);
+      console.warn('[CMS ENGINE]: Network pipeline failure. Initializing emergency local fallback state:', error);
+      renderSiteContent(LOCAL_FALLBACK_DATA);
     });
+}
+
+function renderSiteContent(data) {
+  if (data.hero) {
+    paintBrandingAndNav(data.hero.branding, data.hero.navigationLinks);
+    paintHeroTypography(data.hero.mainHeading, data.hero.subHeading);
+    paintActionTriggers(data.hero.primaryCTA, data.hero.secondaryCTA);
+    paintVisualSurfaces(data.hero.bgImageUrl);
+  }
+  if (data.process) paintProcessMatrix(data.process);
+  if (data.services) paintServicesMatrix(data.services);
+  if (data.projects) paintProjectsMatrix(data.projects);
+  if (data.faq) paintFAQMatrix(data.faq);
+  if (data.footer) paintFooterMatrix(data.footer);
+  if (data.modal) paintAssessmentModalMatrix(data.modal);
+
+  initModalInteractions();
 }
 
 function paintBrandingAndNav(brandTitle, linksArray) {
