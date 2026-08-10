@@ -1,13 +1,7 @@
-/**
- * SOLAR AND SECURE - MASTER INTEGRATED CMS & INTERACTION ENGINE
- * Pure bare-metal JavaScript infrastructure using native fetch().
- * Integrates dynamic Sanity data delivery with custom lifecycle event delegation handlers.
- */
-
 const CMS_CONFIG = {
   projectId: 'zmqqi4n3',
   dataset: 'production',
-  apiVersion: 'v2026-06-14'
+  apiVersion: '2024-01-01'
 };
 
 const GLOBAL_CMS_QUERY = `{
@@ -81,7 +75,6 @@ const GLOBAL_CMS_QUERY = `{
 
 const SANITY_API_URL = `https://${CMS_CONFIG.projectId}.api.sanity.io/${CMS_CONFIG.apiVersion}/data/query/${CMS_CONFIG.dataset}?query=${encodeURIComponent(GLOBAL_CMS_QUERY)}`;
 
-// Master pipeline trigger on content availability
 document.addEventListener('DOMContentLoaded', () => {
   executeContentPipeline();
 });
@@ -98,7 +91,6 @@ function executeContentPipeline() {
       const data = payload.result;
       if (!data) return;
 
-      // Component execution chain
       if (data.hero) {
         paintBrandingAndNav(data.hero.branding, data.hero.navigationLinks);
         paintHeroTypography(data.hero.mainHeading, data.hero.subHeading);
@@ -112,7 +104,6 @@ function executeContentPipeline() {
       if (data.footer) paintFooterMatrix(data.footer);
       if (data.modal) paintAssessmentModalMatrix(data.modal);
 
-      // Initialize native modal toggles and interaction overlays
       initModalInteractions();
 
       console.log('[CMS ENGINE]: Structural initialization execution complete.');
@@ -121,12 +112,6 @@ function executeContentPipeline() {
       console.error('[CMS ENGINE]: Operational failure on component assembly execution:', error);
     });
 }
-
-/**
- * ============================================================================
- * CORE UI DOM PAINTERS
- * ============================================================================
- */
 
 function paintBrandingAndNav(brandTitle, linksArray) {
   const brandingTarget = document.querySelector('.brand-title-target');

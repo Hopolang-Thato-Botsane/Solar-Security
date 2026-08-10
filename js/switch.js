@@ -1,6 +1,3 @@
-/**
- * LIGHTWEIGHT TOGGLE ENGINE
- */
 document.addEventListener("DOMContentLoaded", () => {
   const powerOverlay = document.getElementById("power-curtain");
   const activatorCheckbox = document.getElementById("grid-activator-checkbox");
