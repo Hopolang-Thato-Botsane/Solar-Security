@@ -18,7 +18,12 @@ const GLOBAL_CMS_QUERY = `{
     sectionMiniHeading,
     sectionHeading,
     sectionDescription,
-    processCards[] { cardNumber, cardHeading, cardDescription }
+    processCards[] {
+      cardNumber,
+      cardHeading,
+      cardDescription,
+      "imageUrl": cardImage.asset->url
+    }
   },
   "services": *[_type == "servicesSection"][0] {
     sectionMiniHeading,
@@ -192,11 +197,9 @@ function paintVisualSurfaces(imageUrl) {
 }
 
 function paintProcessMatrix(processData) {
-  const miniTarget = document.querySelector('.process-mini-target');
   const titleTarget = document.querySelector('.process-title-target');
   const leadTarget = document.querySelector('.process-lead-target');
 
-  if (miniTarget && processData.sectionMiniHeading) miniTarget.textContent = processData.sectionMiniHeading;
   if (titleTarget && processData.sectionHeading) titleTarget.textContent = processData.sectionHeading;
   if (leadTarget && processData.sectionDescription) leadTarget.textContent = processData.sectionDescription;
 
@@ -206,16 +209,26 @@ function paintProcessMatrix(processData) {
     processData.processCards.forEach(card => {
       const li = document.createElement('li');
       li.className = 'step-card';
-      const badge = document.createElement('div');
-      badge.className = 'step-number-badge';
-      badge.textContent = card.cardNumber || '';
+
+      if (card.imageUrl) {
+        const frame = document.createElement('div');
+        frame.className = 'step-image-frame';
+        const img = document.createElement('img');
+        img.src = card.imageUrl;
+        img.alt = card.cardHeading || 'Process Step';
+        img.loading = 'lazy';
+        frame.appendChild(img);
+        li.appendChild(frame);
+      }
+
       const h3 = document.createElement('h3');
       h3.className = 'step-title';
       h3.textContent = card.cardHeading || '';
+
       const p = document.createElement('p');
       p.className = 'step-description';
       p.textContent = card.cardDescription || '';
-      li.appendChild(badge);
+
       li.appendChild(h3);
       li.appendChild(p);
       gridTarget.appendChild(li);
